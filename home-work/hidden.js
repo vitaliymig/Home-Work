@@ -1,6 +1,33 @@
 function foundationMessage(string) {
-  const sentences = string.toLowerCase().split(/[\?|\!|\.]+\s+/);
-  const allDecodedWords = sentences.reduce(() => {}, []);
+  const sentences = string
+    .toLowerCase()
+    .split(/[\?|\!|\.]+\s+/)
+    .filter(Boolean);
+  const allDecodedWords = sentences.reduce(
+    (decoded, sentence, sentenceIdx, sentencesArray) => {
+      if (
+        sentenceIdx == 0 ||
+        (sentenceIdx > decoded.length &&
+          sentenceIdx < sentencesArray.length - 1)
+      ) {
+        const encodedWords = sentence.split(/\s*[,|'|"|-]*\s"*/);
+        const decodedWords = encodedWords.map((encodedWord, encodedWordIdx) => {
+          return sentencesArray[sentenceIdx + encodedWordIdx + 1].split(
+            /\s*[,|'|"|-]*\s"*/
+          )[encodedWord.length - 1];
+        });
+        decodedWords[0] =
+          decodedWords[0][0].toUpperCase() + decodedWords[0].slice(1);
+        decodedWords[decodedWords.length - 1] =
+          decodedWords[decodedWords.length - 1] + ".";
+        return [...decoded, ...decodedWords];
+      } else {
+        return decoded;
+      }
+    },
+    []
+  );
+  return allDecodedWords.join(" ");
 }
 console.log(
   foundationMessage(
